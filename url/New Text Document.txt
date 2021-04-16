@@ -1,0 +1,2 @@
+https://github.com/pdanh2682000/manager_device_tmd.git
+https://www.postgresql.vn/blog/jdbcdriver_tutorial
