@@ -4,7 +4,8 @@ import java.sql.Date;
 
 public class ThietBi {
 	private String maTB, tenTB, maPhong, maTinhTrang;
-	private Date ngayNhapTB, hanBT;
+	private Date ngayNhapTB;
+	private int hanBT;
 	
 	public ThietBi() {
 		maTB = new String("");
@@ -12,16 +13,16 @@ public class ThietBi {
 		maPhong = new String("");
 		maTinhTrang = new String("");
 		ngayNhapTB = new Date(0);
-		hanBT = new Date(0);
+		hanBT = 0;
 	}
 	public ThietBi(String maTB, String tenTB, String maPhong,
-			String maTinhTrang, Date ngayNhapTB, Date hanBT) {
+			String maTinhTrang, Date ngayNhapTB, int hanBT) {
 		this.maTB = new String(maTB);
 		this.tenTB = new String(tenTB);
 		this.maPhong = new String(maPhong);
 		this.maTinhTrang = new String(maTinhTrang);
 		this.ngayNhapTB = new Date(ngayNhapTB.getTime());
-		this.hanBT = new Date(hanBT.getTime());
+		this.hanBT = hanBT;
 	}
 	public String getMaTB() {
 		return maTB;
@@ -53,10 +54,10 @@ public class ThietBi {
 	public void setNgayNhapTB(Date ngayNhapTB) {
 		this.ngayNhapTB = ngayNhapTB;
 	}
-	public Date getHanBT() {
+	public int getHanBT() {
 		return hanBT;
 	}
-	public void setHanBT(Date hanBT) {
+	public void setHanBT(int hanBT) {
 		this.hanBT = hanBT;
 	}
 	

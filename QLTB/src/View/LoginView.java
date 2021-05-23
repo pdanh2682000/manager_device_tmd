@@ -17,6 +17,8 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JPasswordField;
+import java.awt.Font;
+import java.awt.Color;
 
 public class LoginView extends JFrame {
 
@@ -27,6 +29,7 @@ public class LoginView extends JFrame {
 	private User user;
 	private UserDao userDao;
 	private JPasswordField textPassword;
+	private JLabel lblNewLabel;
 
 	/**
 	 * Launch the application.
@@ -54,7 +57,10 @@ public class LoginView extends JFrame {
 		
 		// system
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 375, 300);
+		setLocationRelativeTo(null);
+		setResizable(false);
+		setTitle("Login");
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -97,6 +103,12 @@ public class LoginView extends JFrame {
 		textPassword = new JPasswordField();
 		textPassword.setBounds(190, 144, 86, 20);
 		contentPane.add(textPassword);
+		
+		lblNewLabel = new JLabel("Đăng Nhập");
+		lblNewLabel.setForeground(new Color(102, 0, 0));
+		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		lblNewLabel.setBounds(132, 22, 144, 35);
+		contentPane.add(lblNewLabel);
 	}
 	
 	public User createUser() {
