@@ -28,6 +28,21 @@ import java.awt.Color;
 import javax.swing.SwingConstants;
 import java.awt.Font;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Iterator;
+ 
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 public class ThietBiView extends JFrame {
 
 	private JPanel contentPane;
@@ -207,6 +222,22 @@ public class ThietBiView extends JFrame {
 		textCountry.setBounds(498, 64, 71, 26);
 		contentPane.add(textCountry);
 		textCountry.setColumns(10);
+		
+		JButton btnFile = new JButton("Load File");
+		btnFile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					insertFromExcel();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		btnFile.setForeground(Color.WHITE);
+		btnFile.setBackground(new Color(0, 153, 204));
+		btnFile.setBounds(175, 288, 113, 30);
+		contentPane.add(btnFile);
 	}
 	
 	public Connection getConnection(String host, String port, String dbName, String username,
@@ -271,6 +302,144 @@ public class ThietBiView extends JFrame {
 			}
 		}
 	}
+	
+	// excel
+	public void insertFromExcel() throws IOException {
+		String tenTB = new String("");
+		String model = new String("");
+		String company = new String("");
+		String country = new String("");
+		double namSX = 0;
+		double namSD = 0;
+		String tinhTrang = new String("");
+		double giaThanh = 0;
+		String ghiChu = new String("");
+		
+		
+		// Đọc một file XSL.
+		FileInputStream inputStream = new FileInputStream(new File("C:\\Users\\DUYANH\\Documents\\Zalo Received Files\\qltb1.xlsx"));
+
+		// Đối tượng workbook cho file XSL.
+		XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
+
+		// Lấy ra sheet đầu tiên từ workbook
+		XSSFSheet sheet = workbook.getSheetAt(0);
+
+		// Lấy ra Iterator cho tất cả các dòng của sheet hiện tại.
+		Iterator<Row> rowIterator = sheet.iterator();
+
+		while (rowIterator.hasNext()) {
+			Row row = rowIterator.next();
+			Cell cell = row.getCell(1);
+			tenTB = cell.getStringCellValue();
+			cell = row.getCell(2);
+			model = cell.getStringCellValue();
+			cell = row.getCell(3);
+			company = cell.getStringCellValue();
+			cell = row.getCell(4);
+			country = cell.getStringCellValue();
+			cell = row.getCell(5);
+			namSX = cell.getNumericCellValue();
+			cell = row.getCell(6);
+			namSD = cell.getNumericCellValue();
+			cell = row.getCell(7);
+			tinhTrang = cell.getStringCellValue();
+			cell = row.getCell(9);
+			giaThanh = cell.getNumericCellValue();
+			cell = row.getCell(10);
+			ghiChu = cell.getStringCellValue();
+					
+			System.out.println(tenTB +" " + model +" " + company +" " + country +" " + namSX +" " + namSD +" "+
+			tinhTrang + " " + giaThanh + " "+ ghiChu);
+			
+			String result = new String("");
+			char keys[] = {'Ă', 'Â', 'Á', 'À', 'Ạ', 'Ả', 'Ã', 'Ắ', 'Ằ', 'Ẳ', 'Ẵ', 'Ặ','Ấ',
+					'Ầ', 'Ẩ', 'Ẫ', 'Ậ', 'Ô', 'Ơ', 'Ó', 'Ò', 'Ỏ', 'Õ', 'Ọ', 'Ố', 'Ồ', 'Ổ', 'Ỗ' , 'Ộ' 
+					, 'Ớ', 'Ờ', 'Ở', 'Ỡ', 'Ợ', 'Ĩ', 'Ỉ', 'Í', 'Ị', 'Ì', 'É', 'È', 'Ẻ', 'Ẽ', 'Ẹ',
+					'Ê', 'Ế', 'Ề', 'Ể', 'Ễ', 'Ệ', 'Ú', 'Ù', 'Ụ', 'Ủ', 'Ũ'};
+			char values[] = {'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A',
+					 'A', 'A', 'A', 'A', 'A', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O',
+					 'O', 'O', 'O', 'O', 'O', 'I', 'I', 'I', 'I', 'I',
+					 'E', 'E','E', 'E','E', 'E','E', 'E','E', 'E','E', 'U', 'U', 'U', 'U', 'U'};
+			if(!tenTB.equals("")) {
+				StringTokenizer str = new StringTokenizer(tenTB);
+				while(str.hasMoreTokens()) {
+					char temp = str.nextToken().toUpperCase().charAt(0);
+					for(int i=0; i<keys.length; i++) {
+						if(temp == keys[i]) temp = values[i];
+					}
+					result += temp;	
+				}
+			}
+			// database
+			String maTB = new String("");
+			int indexMaTB = 0;
+			ArrayList<String> arr = getAllMaTB(result);
+			if(!arr.isEmpty()) {
+				String tail = arr.get(arr.size()-1).substring(result.length());
+				if(tail.equals("")) indexMaTB = 1;
+				else indexMaTB = Integer.valueOf(tail) + 1;
+//				System.out.println(tail);
+				maTB = result.concat(String.valueOf(indexMaTB));
+			}
+			else maTB = result + "1";
+			
+			String maTT = "";
+			if(tinhTrang.equals("Mới")) maTT = "TT1";
+			else maTT = "TT2";
+//			insertDB_TB(maTB, tenTB, "A1", maTT, "1/1/2020", "3", model, company, country);
+
+			// Lấy Iterator cho tất cả các cell của dòng hiện tại.
+//			Iterator<Cell> cellIterator = row.cellIterator();
+//			while (cellIterator.hasNext()) {
+//				Cell cell = cellIterator.next();
+//
+//				// Đổi thành getCellType() nếu sử dụng POI 4.x
+//				CellType cellType = cell.getCellTypeEnum();
+//
+//				switch (cellType) {
+//				case _NONE:
+//					System.out.print("");
+//					System.out.print("\t");
+//					break;
+//				case BOOLEAN:
+//					System.out.print(cell.getBooleanCellValue());
+//					System.out.print("\t");
+//					break;
+//				case BLANK:
+//					System.out.print("");
+//					System.out.print("\t");
+//					break;
+//				case FORMULA:
+//
+//					// Công thức
+//					System.out.print(cell.getCellFormula());
+//					System.out.print("\t");
+//
+//					FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+//
+//					// In ra giá trị từ công thức
+//					System.out.print(evaluator.evaluate(cell).getNumberValue());
+//					break;
+//				case NUMERIC:
+//					System.out.print("n:" + cell.getNumericCellValue());
+//					System.out.print("\t");
+//					break;
+//				case STRING:
+//					System.out.print(cell.getStringCellValue());
+//					System.out.print("\t");
+//					break;
+//				case ERROR:
+//					System.out.print("!");
+//					System.out.print("\t");
+//					break;
+//				}
+//
+//			}
+			System.out.println("");
+		}
+	}
+	
 	
 	
 	public String getMaTT(int index) {
