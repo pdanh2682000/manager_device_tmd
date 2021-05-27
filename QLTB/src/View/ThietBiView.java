@@ -125,7 +125,8 @@ public class ThietBiView extends JFrame {
 						result += temp;	
 					}
 				}
-				
+				// database
+				insertDB();
 			}
 		});
 		btnAdd.setBounds(32, 288, 113, 30);
@@ -151,41 +152,75 @@ public class ThietBiView extends JFrame {
 		lblNewLabel.setForeground(new Color(0, 0, 0));
 		lblNewLabel.setBounds(229, 11, 226, 22);
 		contentPane.add(lblNewLabel);
-
 	}
 	
-	public void connectDB() {
-		String host="localhost";
-		String port="5432";
-		String dbname="QLTB";
-		String user="postgres";
-		String pass="123";
-		String dburl = "jdbc:postgresql://"+host+":"+port+"/"+dbname+"?loggerLevel=OFF";
+	public Connection getConnection(String host, String port, String dbName, String username,
+			String password) {
 		Connection conn = null;
-		Statement stmt = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-        try {
-            conn = DriverManager.getConnection(dburl, user, pass);
-            System.out.println("connect successfully!");
-        } catch (Exception ex) {
-            System.out.println("connect failure!");
-            ex.printStackTrace();
-        }
-        
-        try {
-            // create statement
-            stmt = conn.createStatement();
-            // statement
-            rs = stmt.executeQuery("select * from public.phong");
-            // show data
-            while (rs.next()) {
-                System.out.println(rs.getString(1) + "  " + rs.getString(2));
-            }
-            // close connection
-            conn.close();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+		String dbURL = "jdbc:postgresql://"+host+":"+port+"/"+dbName+"?loggerLevel=OFF";
+		try {
+			conn = DriverManager.getConnection(dbURL, username, password);
+			System.out.println("Connect successfully!");
+		}
+		catch(Exception e) {
+			System.out.println("Connect failure!");
+			e.printStackTrace();
+		}
+		return conn;
 	}
+	
+	public void insertDB() {
+		Connection conn = getConnection("localhost", "5432", "QLTB", "postgres", "123");
+		if(conn != null) {
+			Statement st = null;
+			ResultSet rs = null;
+			PreparedStatement  ps = null;
+			try {
+				st = conn.createStatement();
+				String sqlQuery = "INSERT INTO public.phong VALUES (?, ?)";
+				ps = conn.prepareStatement(sqlQuery);
+				ps.setString(1, "test");
+				ps.setString(2, "test");
+				ps.execute();
+			}
+			catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+//	public void connectDB() {
+//		String host="localhost";
+//		String port="5432";
+//		String dbname="QLTB";
+//		String user="postgres";
+//		String pass="123";
+//		String dburl = "jdbc:postgresql://"+host+":"+port+"/"+dbname+"?loggerLevel=OFF";
+//		Connection conn = null;
+//		Statement stmt = null;
+//		PreparedStatement pstmt = null;
+//		ResultSet rs = null;
+//        try {
+//            conn = DriverManager.getConnection(dburl, user, pass);
+//            System.out.println("connect successfully!");
+//        } catch (Exception ex) {
+//            System.out.println("connect failure!");
+//            ex.printStackTrace();
+//        }
+//        
+//        try {
+//            // create statement
+//            stmt = conn.createStatement();
+//            // statement
+//            rs = stmt.executeQuery("select * from public.phong");
+//            // show data
+//            while (rs.next()) {
+//                System.out.println(rs.getString(1) + "  " + rs.getString(2));
+//            }
+//            // close connection
+//            conn.close();
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//        }
+//	}
 }
