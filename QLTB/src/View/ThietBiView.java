@@ -247,6 +247,13 @@ public class ThietBiView extends JFrame {
 		contentPane.add(textMoney);
 		
 		JButton btnShow = new JButton("Xem");
+		btnShow.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ShowView show = new ShowView();
+				show.setVisible(true);
+				show.setDefaultCloseOperation(show.HIDE_ON_CLOSE);
+			}
+		});
 		btnShow.setForeground(Color.WHITE);
 		btnShow.setBackground(new Color(0, 153, 204));
 		btnShow.setBounds(312, 288, 113, 30);
@@ -364,7 +371,7 @@ public class ThietBiView extends JFrame {
 
 		// Đọc một file XSL.
 		FileInputStream inputStream = new FileInputStream(
-				new File("C:\\Users\\DUYANH\\Documents\\GitHub\\workspaceTMD\\QLTB\\qltb2.xlsx"));
+				new File("D:\\duyanh\\manager_device_tmd\\QLTB\\qltb2.xlsx"));
 
 		// Đối tượng workbook cho file XSL.
 		XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
