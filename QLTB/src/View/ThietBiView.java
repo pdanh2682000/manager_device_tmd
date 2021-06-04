@@ -168,7 +168,7 @@ public class ThietBiView extends JFrame {
 		btnAdd.setBounds(32, 288, 113, 30);
 		contentPane.add(btnAdd);
 
-		comboMaP.setModel(new DefaultComboBoxModel(new String[] { "A1 (Phòng A1)", "A2 (Phòng A2)", "A3 (Phòng A3)" }));
+		comboMaP.setModel(new DefaultComboBoxModel(new String[] {"A1 (Phòng A1)", "A2 (Phòng A2)", "A3 (Phòng A3)"}));
 		comboMaP.setBounds(393, 204, 132, 23);
 		contentPane.add(comboMaP);
 
