@@ -6,12 +6,16 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.text.DateFormatter;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.DefaultComboBoxModel;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
@@ -43,7 +47,11 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import Model.ThietBi;
+
 public class ThietBiView extends JFrame {
+
+//	private ThietBi thietbi;
 
 	private JPanel contentPane;
 	private JTextField textTB;
@@ -53,22 +61,24 @@ public class ThietBiView extends JFrame {
 	private JTextField textCompany;
 	private JTextField textCountry;
 	private JTextField textMoney;
+	private JTextField textNamSX;
+	private JTextField textNamSD;
 
 	/**
 	 * Launch the application.
 	 */
-//	public static void main(String[] args) {
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					ThietBiView frame = new ThietBiView();
-//					frame.setVisible(true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//	}
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					ThietBiView frame = new ThietBiView();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
 
 	/**
 	 * Create the frame.
@@ -105,7 +115,7 @@ public class ThietBiView extends JFrame {
 
 		JLabel labelMaP = new JLabel("Mã Phòng");
 		labelMaP.setFont(new Font("Tahoma", Font.PLAIN, 13));
-		labelMaP.setBounds(312, 206, 71, 22);
+		labelMaP.setBounds(243, 206, 71, 22);
 		contentPane.add(labelMaP);
 
 		JLabel labelBT = new JLabel("Hạn BT (month)");
@@ -128,8 +138,8 @@ public class ThietBiView extends JFrame {
 		btnAdd.setBackground(new Color(0, 153, 204));
 		btnAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+
 				// get first character for every word (Upper Case)
-				
 				String tenTB = textTB.getText();
 				String maTB = "";
 				try {
@@ -139,6 +149,7 @@ public class ThietBiView extends JFrame {
 					e2.printStackTrace();
 				}
 //				System.out.println(maTB);
+
 				String maPhong = getMaPhong(comboMaP.getSelectedIndex());
 				String maTT = getMaTT(comboMaTT.getSelectedIndex());
 				String ngayNhap = textBT.getText();
@@ -146,34 +157,64 @@ public class ThietBiView extends JFrame {
 				String model = textModel.getText();
 				String company = textCompany.getText();
 				String country = textCountry.getText();
+				int namSX = 2021;
+				int namSD = 2021;
+				if(!textNamSX.getText().equals(""))
+					namSX = Integer.valueOf(textNamSX.getText());
+				if(!textNamSD.getText().equals(""))
+					namSD = Integer.valueOf(textNamSX.getText());
 				double giaTien = 0;
-				if(!textMoney.getText().equals(""))
+				if (!textMoney.getText().equals(""))
 					giaTien = Double.parseDouble(textMoney.getText());
+
+				// date default
 				String strDate = "2021-01-01";
-				if(!textDate.getText().equals(""))
+				if (!textDate.getText().equals(""))
 					strDate = textDate.getText();
 				Date dateNhap = Date.valueOf(strDate);
+				Date dateBT;
 				long numBT = 0;
-				if(!textBT.getText().equals(""))
+				if (!textBT.getText().equals("")) {
 					numBT = dateNhap.getTime() + (Long.valueOf(textBT.getText()) * 30 * 24 * 60 * 60 * 1000);
-				Date dateBT = new Date(numBT);
-				try {
-					insertDB_TB(maTB, tenTB, maPhong, maTT, 2020 , 2021 , model, country, company, dateNhap, giaTien, dateBT);
-				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					dateBT = new Date(numBT);
+				}
+				else dateBT = Date.valueOf(strDate);
+
+				// set default data
+				if (model.equals(""))
+					model = "no model";
+				if (country.equals(""))
+					model = "no country";
+				if (company.equals(""))
+					model = "no company";
+
+				// check 4 field data absolute
+				if (tenTB.equals(""))
+					showMessage("Tên thiết bị không được để trống!");
+				else if (maPhong.equals(""))
+					showMessage("Mã phòng không được để trống!");
+				else if (maTT.equals(""))
+					showMessage("Mã tình trạng không được để trống!");
+				else {
+					try {
+						insertDB_TB(maTB, tenTB, maPhong, maTT, namSX, namSD, model, country, company, dateNhap, giaTien,
+								dateBT);
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 				}
 			}
 		});
 		btnAdd.setBounds(32, 288, 113, 30);
 		contentPane.add(btnAdd);
 
-		comboMaP.setModel(new DefaultComboBoxModel(new String[] {"A1 (Phòng A1)", "A2 (Phòng A2)", "A3 (Phòng A3)"}));
-		comboMaP.setBounds(393, 204, 132, 23);
+		comboMaP.setModel(new DefaultComboBoxModel(new String[] { "A1 (Phòng A1)", "A2 (Phòng A2)", "A3 (Phòng A3)" }));
+		comboMaP.setBounds(312, 207, 132, 23);
 		contentPane.add(comboMaP);
 
 		comboMaTT.setModel(new DefaultComboBoxModel(new String[] { "TT00 (Tốt)", "TT01 (Lỗi)", "TT02 (Hư)" }));
-		comboMaTT.setBounds(104, 207, 145, 22);
+		comboMaTT.setBounds(78, 207, 145, 22);
 		contentPane.add(comboMaTT);
 
 		textBT = new JTextField();
@@ -220,14 +261,35 @@ public class ThietBiView extends JFrame {
 		JButton btnFile = new JButton("Load File");
 		btnFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				try {
-					insertFromExcel();
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+
+				String pathExcel = new String("");
+				JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+				jfc.setDialogTitle("Chọn tệp tin: ");
+				jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+				// filter
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("Excel files", "xlsx", "xls");
+				jfc.addChoosableFileFilter(filter);
+				jfc.setFileFilter(filter);
+
+				int returnValue = jfc.showOpenDialog(null);
+				if (returnValue == JFileChooser.APPROVE_OPTION) {
+					pathExcel = jfc.getSelectedFile().getPath();
+					System.out.println(pathExcel);
+				}
+
+				// insert
+				if (!pathExcel.equals("")) {
+					
+					try {
+						insertFromExcel(pathExcel);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 				}
 			}
 		});
@@ -235,17 +297,17 @@ public class ThietBiView extends JFrame {
 		btnFile.setBackground(new Color(0, 153, 204));
 		btnFile.setBounds(175, 288, 113, 30);
 		contentPane.add(btnFile);
-		
+
 		JLabel labelMoney = new JLabel("Thành tiền");
 		labelMoney.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		labelMoney.setBounds(568, 144, 86, 14);
 		contentPane.add(labelMoney);
-		
+
 		textMoney = new JTextField();
 		textMoney.setColumns(10);
 		textMoney.setBounds(643, 134, 124, 26);
 		contentPane.add(textMoney);
-		
+
 		JButton btnShow = new JButton("Xem");
 		btnShow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -256,8 +318,39 @@ public class ThietBiView extends JFrame {
 		});
 		btnShow.setForeground(Color.WHITE);
 		btnShow.setBackground(new Color(0, 153, 204));
-		btnShow.setBounds(312, 288, 113, 30);
+		btnShow.setBounds(470, 288, 113, 30);
 		contentPane.add(btnShow);
+		
+		JLabel labelNamSX = new JLabel("Năm SX");
+		labelNamSX.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		labelNamSX.setBounds(460, 210, 57, 14);
+		contentPane.add(labelNamSX);
+		
+		textNamSX = new JTextField();
+		textNamSX.setColumns(10);
+		textNamSX.setBounds(527, 205, 86, 26);
+		contentPane.add(textNamSX);
+		
+		JLabel labelNamSD = new JLabel("Năm SD");
+		labelNamSD.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		labelNamSD.setBounds(623, 211, 57, 14);
+		contentPane.add(labelNamSD);
+		
+		textNamSD = new JTextField();
+		textNamSD.setColumns(10);
+		textNamSD.setBounds(681, 207, 86, 26);
+		contentPane.add(textNamSD);
+		
+		JButton btnExport = new JButton("Xuất Excel");
+		btnExport.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("xuaat excel");
+			}
+		});
+		btnExport.setForeground(Color.WHITE);
+		btnExport.setBackground(new Color(0, 153, 204));
+		btnExport.setBounds(323, 288, 113, 30);
+		contentPane.add(btnExport);
 	}
 
 	public Connection getConnection(String host, String port, String dbName, String username, String password) {
@@ -298,13 +391,20 @@ public class ThietBiView extends JFrame {
 	public void insertDB_TB(String maTB, String tenTB, String maPhong, String maTT, double namSX, double namSD,
 			String model, String country, String company, Date date, double giaTien, Date hanBT) throws SQLException {
 		Connection conn = getConnection("localhost", "5432", "QLTB", "postgres", "123");
-		if(maPhong.equals("")) maPhong = "A1"; // default
-		if(maTT.equals("")) maTT = "TT1";
-		if(model.equals("")) model = "no branch";
-		if(country.equals("")) country = "no country";
-		if(company.equals("")) company = "no company";
-		if(date == null) date = new Date(0);
-		if(hanBT == null) hanBT = new Date(0);
+		if (maPhong.equals(""))
+			maPhong = "A1"; // default
+		if (maTT.equals(""))
+			maTT = "TT1";
+		if (model.equals(""))
+			model = "no model";
+		if (country.equals(""))
+			country = "no country";
+		if (company.equals(""))
+			company = "no company";
+		if (date == null)
+			date = Date.valueOf("2021-01-01");
+		if (hanBT == null)
+			hanBT = Date.valueOf("2021-01-01");
 		if (conn != null) {
 			PreparedStatement ps = null;
 			try {
@@ -334,10 +434,11 @@ public class ThietBiView extends JFrame {
 			}
 		}
 	}
-	
+
 	public void insertDB_TL(String maTB, Date date, Double giaTien) throws SQLException {
 		Connection conn = getConnection("localhost", "5432", "QLTB", "postgres", "123");
-		if(giaTien <= 0)	 giaTien = (double)1;
+		if (giaTien <= 0)
+			giaTien = (double) 1;
 		if (conn != null) {
 			PreparedStatement ps = null;
 			try {
@@ -348,8 +449,7 @@ public class ThietBiView extends JFrame {
 				ps.setDouble(3, giaTien);
 				ps.execute();
 				conn.close();
-			}
-			catch(Exception e) {
+			} catch (Exception e) {
 				conn.close();
 				e.printStackTrace();
 			}
@@ -357,8 +457,8 @@ public class ThietBiView extends JFrame {
 	}
 
 	// excel
-	public void insertFromExcel() throws IOException, SQLException {
-		double stt =  0;
+	public void insertFromExcel(String pathExcel) throws IOException, SQLException {
+		double stt = 0;
 		String tenTB = new String("no info");
 		String model = new String("no info");
 		String company = new String("no info");
@@ -370,8 +470,7 @@ public class ThietBiView extends JFrame {
 		String ghiChu = new String("no info");
 
 		// Đọc một file XSL.
-		FileInputStream inputStream = new FileInputStream(
-				new File("D:\\duyanh\\manager_device_tmd\\QLTB\\qltb2.xlsx"));
+		FileInputStream inputStream = new FileInputStream(new File(pathExcel));
 
 		// Đối tượng workbook cho file XSL.
 		XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
@@ -510,10 +609,10 @@ public class ThietBiView extends JFrame {
 				}
 			}
 			insertDB_TB(getMaTB(tenTB), tenTB, "", "", namSX, namSD, model, country, company, null, giaThanh, null);
-			System.out.println(getMaTB(tenTB) + " - " + tenTB + " - " + "A1" + " - " + "TT1" +
-					namSX + " - " + namSD + " - " + model);
-			 //reset
-			stt =  0;
+			System.out.println(getMaTB(tenTB) + " - " + tenTB + " - " + "A1" + " - " + "TT1" + namSX + " - " + namSD
+					+ " - " + model);
+			// reset
+			stt = 0;
 			tenTB = new String("no info");
 			model = new String("no info");
 			company = new String("no info");
@@ -551,17 +650,15 @@ public class ThietBiView extends JFrame {
 			return "A1";
 		}
 	}
-	
+
 	public String getMaTB(String tenTB) throws SQLException {
 		String result = new String("");
-		char keys[] = { 'Ă', 'Â', 'Á', 'À', 'Ạ', 'Ả', 'Ã', 'Ắ', 'Ằ', 'Ẳ', 'Ẵ', 'Ặ', 'Ấ', 'Ầ', 'Ẩ', 'Ẫ', 'Ậ',
-				'Ô', 'Ơ', 'Ó', 'Ò', 'Ỏ', 'Õ', 'Ọ', 'Ố', 'Ồ', 'Ổ', 'Ỗ', 'Ộ', 'Ớ', 'Ờ', 'Ở', 'Ỡ', 'Ợ', 'Ĩ', 'Ỉ',
-				'Í', 'Ị', 'Ì', 'É', 'È', 'Ẻ', 'Ẽ', 'Ẹ', 'Ê', 'Ế', 'Ề', 'Ể', 'Ễ', 'Ệ', 'Ú', 'Ù', 'Ụ', 'Ủ', 'Ũ', 
-				'Đ'};
-		char values[] = { 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A',
-				'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'I', 'I',
-				'I', 'I', 'I', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'U', 'U', 'U', 'U', 'U'
-				, 'D'};
+		char keys[] = { 'Ă', 'Â', 'Á', 'À', 'Ạ', 'Ả', 'Ã', 'Ắ', 'Ằ', 'Ẳ', 'Ẵ', 'Ặ', 'Ấ', 'Ầ', 'Ẩ', 'Ẫ', 'Ậ', 'Ô', 'Ơ',
+				'Ó', 'Ò', 'Ỏ', 'Õ', 'Ọ', 'Ố', 'Ồ', 'Ổ', 'Ỗ', 'Ộ', 'Ớ', 'Ờ', 'Ở', 'Ỡ', 'Ợ', 'Ĩ', 'Ỉ', 'Í', 'Ị', 'Ì', 'É',
+				'È', 'Ẻ', 'Ẽ', 'Ẹ', 'Ê', 'Ế', 'Ề', 'Ể', 'Ễ', 'Ệ', 'Ú', 'Ù', 'Ụ', 'Ủ', 'Ũ', 'Đ' };
+		char values[] = { 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'O', 'O',
+				'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'I', 'I', 'I', 'I', 'I', 'E',
+				'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'U', 'U', 'U', 'U', 'U', 'D' };
 		if (!tenTB.equals("")) {
 			StringTokenizer str = new StringTokenizer(tenTB);
 			while (str.hasMoreTokens()) {
@@ -569,7 +666,8 @@ public class ThietBiView extends JFrame {
 				for (int i = 0; i < keys.length; i++) {
 					if (temp == keys[i])
 						temp = values[i];
-					if(temp <= 47 || (temp >= 58 && temp <= 64)) temp = 'J'; // cac ki tu dac biet
+					if (temp <= 47 || (temp >= 58 && temp <= 64))
+						temp = 'J'; // cac ki tu dac biet
 				}
 				result += temp;
 			}
@@ -591,5 +689,9 @@ public class ThietBiView extends JFrame {
 		} else
 			maTB = result + "1";
 		return maTB;
+	}
+
+	public void showMessage(String message) {
+		JOptionPane.showMessageDialog(this, message);
 	}
 }
