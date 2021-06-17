@@ -25,6 +25,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.awt.event.ActionEvent;
@@ -46,6 +47,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -71,18 +73,18 @@ public class ThietBiView extends JFrame {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ThietBiView frame = new ThietBiView();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+//	public static void main(String[] args) {
+//		EventQueue.invokeLater(new Runnable() {
+//			public void run() {
+//				try {
+//					ThietBiView frame = new ThietBiView();
+//					frame.setVisible(true);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		});
+//	}
 
 	/**
 	 * Create the frame.
@@ -203,9 +205,11 @@ public class ThietBiView extends JFrame {
 					try {
 						insertDB_TB(maTB, tenTB, maPhong, maTT, namSX, namSD, model, country, company, dateNhap, giaTien,
 								dateBT);
+						showMessage("Thêm mới thành công!");
 					} catch (SQLException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
+						showMessage("Thêm mới thất bại!");
 					}
 				}
 			}
@@ -287,12 +291,14 @@ public class ThietBiView extends JFrame {
 					
 					try {
 						insertFromExcel(pathExcel);
+						showMessage("Load File thành công!");
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					} catch (SQLException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
+						showMessage("Load File thất bại!");
 					}
 				}
 			}
@@ -367,7 +373,7 @@ public class ThietBiView extends JFrame {
 		            // crate statement
 		            Statement stmt = conn.createStatement();
 		            // get data from table 'student'
-		            ResultSet rs = stmt.executeQuery("SELECT * from public.thietbi");
+		            ResultSet rs = stmt.executeQuery("SELECT * from public.thietbi NATURAL JOIN public.thanhly");
 		            // show data
 		            while (rs.next()) {
 //		                System.out.println(rs.getInt(1) + "  " + rs.getString(2) 
@@ -384,6 +390,11 @@ public class ThietBiView extends JFrame {
 		                tb.setModel(rs.getString(9));
 		                tb.setCountry(rs.getString(10));
 		                tb.setCompany(rs.getString(11));
+		                
+		                DecimalFormat df = new DecimalFormat("##");
+		                String strGiaTien = df.format(rs.getDouble(13)); 
+		                
+		                tb.setGiaTien(Double.parseDouble(strGiaTien));
 		                list.add(tb);
 		            }
 		            // close connection
@@ -404,23 +415,23 @@ public class ThietBiView extends JFrame {
 
 				row = sheet.createRow(rownum);
 
-				// EmpNo
+			
 				cell = row.createCell(0, CellType.STRING);
 				cell.setCellValue("MaTB");
 				cell.setCellStyle(style);
-				// EmpName
+				
 				cell = row.createCell(1, CellType.STRING);
 				cell.setCellValue("TenTB");
 				cell.setCellStyle(style);
-				// Salary
+		
 				cell = row.createCell(2, CellType.STRING);
 				cell.setCellValue("MaPhong");
 				cell.setCellStyle(style);
-				// Grade
+			
 				cell = row.createCell(3, CellType.STRING);
 				cell.setCellValue("MaTT");
 				cell.setCellStyle(style);
-				// Bonus
+				
 				cell = row.createCell(4, CellType.STRING);
 				cell.setCellValue("NgayNhap");
 				cell.setCellStyle(style);
@@ -447,6 +458,10 @@ public class ThietBiView extends JFrame {
 				
 				cell = row.createCell(10, CellType.STRING);
 				cell.setCellValue("Company");
+				cell.setCellStyle(style);
+				
+				cell = row.createCell(11, CellType.STRING);
+				cell.setCellValue("GiaTien");
 				cell.setCellStyle(style);
 				
 
@@ -490,10 +505,18 @@ public class ThietBiView extends JFrame {
 					cell = row.createCell(10, CellType.STRING);
 					cell.setCellValue(tb.getCompany());
 					
+					cell = row.createCell(11, CellType.STRING);
+					cell.setCellValue(String.valueOf(tb.getGiaTien()));
+					
 				}
+				
+		        // Auto resize column witdth
+		        int numberOfColumn = sheet.getRow(0).getPhysicalNumberOfCells();
+		        autosizeColumn(sheet, numberOfColumn);
+		        
 //				File file = new File("D:/duyanh/readexcel.xls");
 //				System.out.println(pathExcel+"\\thietbi.xls");
-				File file = new File(pathExcel + "\\thietbi.xls");
+				File file = new File(pathExcel + "\\thietbi.xlsx");
 				file.getParentFile().mkdirs();
 
 				FileOutputStream outFile = null;
@@ -505,9 +528,11 @@ public class ThietBiView extends JFrame {
 				}
 				try {
 					workbook.write(outFile);
+					showMessage("Xuất File thành công!");
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
+					showMessage("Xuất File thất bại!");
 				}
 				System.out.println("Created file: " + file.getAbsolutePath());
 			}
@@ -867,5 +892,11 @@ public class ThietBiView extends JFrame {
         XSSFCellStyle style = workbook.createCellStyle();
         style.setFont(font);
         return style;
+    }
+    
+    private static void autosizeColumn(Sheet sheet, int lastColumn) {
+        for (int columnIndex = 0; columnIndex < lastColumn; columnIndex++) {
+            sheet.autoSizeColumn(columnIndex);
+        }
     }
 }
