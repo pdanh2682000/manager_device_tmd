@@ -35,8 +35,10 @@ import java.awt.Font;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -44,6 +46,8 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -344,7 +348,168 @@ public class ThietBiView extends JFrame {
 		JButton btnExport = new JButton("Xuất Excel");
 		btnExport.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("xuaat excel");
+				// choose file
+				String pathExcel = new String();
+				JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+		        jfc.setDialogTitle("Chọn thư mục: ");
+		        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		        int returnValue = jfc.showSaveDialog(null);
+		        if (returnValue == JFileChooser.APPROVE_OPTION) {
+		            if (jfc.getSelectedFile().isDirectory()) {
+		            	pathExcel = jfc.getSelectedFile().getAbsolutePath();
+		                System.out.println("Bạn đã chọn: " + pathExcel);
+		            }
+		        }
+		        // load database
+		        ArrayList<ThietBi> list = new ArrayList<ThietBi>();
+		        Connection conn = getConnection("localhost", "5432", "QLTB", "postgres", "123");
+		        try {
+		            // crate statement
+		            Statement stmt = conn.createStatement();
+		            // get data from table 'student'
+		            ResultSet rs = stmt.executeQuery("SELECT * from public.thietbi");
+		            // show data
+		            while (rs.next()) {
+//		                System.out.println(rs.getInt(1) + "  " + rs.getString(2) 
+//		                        + "  " + rs.getString(3));
+		                ThietBi tb = new ThietBi();
+		                tb.setMaTB(rs.getString(1));
+		                tb.setTenTB(rs.getString(2));
+		                tb.setMaPhong(rs.getString(3));
+		                tb.setMaTinhTrang(rs.getString(4));
+		                tb.setNgayNhapTB(rs.getDate(5));
+		                tb.setHanBT(rs.getDate(6));
+		                tb.setNamSX((int)rs.getDouble(7));
+		                tb.setNamSD((int)rs.getDouble(8));
+		                tb.setModel(rs.getString(9));
+		                tb.setCountry(rs.getString(10));
+		                tb.setCompany(rs.getString(11));
+		                list.add(tb);
+		            }
+		            // close connection
+		            conn.close();
+		        } catch (Exception ex) {
+		            ex.printStackTrace();
+		        }
+		        
+		        // export 
+		        XSSFWorkbook workbook = new XSSFWorkbook();
+				XSSFSheet sheet = workbook.createSheet("ThietBi sheet");
+
+				int rownum = 0;
+				Cell cell;
+				Row row;
+				//
+				XSSFCellStyle style = createStyleForTitle(workbook);
+
+				row = sheet.createRow(rownum);
+
+				// EmpNo
+				cell = row.createCell(0, CellType.STRING);
+				cell.setCellValue("MaTB");
+				cell.setCellStyle(style);
+				// EmpName
+				cell = row.createCell(1, CellType.STRING);
+				cell.setCellValue("TenTB");
+				cell.setCellStyle(style);
+				// Salary
+				cell = row.createCell(2, CellType.STRING);
+				cell.setCellValue("MaPhong");
+				cell.setCellStyle(style);
+				// Grade
+				cell = row.createCell(3, CellType.STRING);
+				cell.setCellValue("MaTT");
+				cell.setCellStyle(style);
+				// Bonus
+				cell = row.createCell(4, CellType.STRING);
+				cell.setCellValue("NgayNhap");
+				cell.setCellStyle(style);
+				
+				cell = row.createCell(5, CellType.STRING);
+				cell.setCellValue("HanBT");
+				cell.setCellStyle(style);
+				
+				cell = row.createCell(6, CellType.STRING);
+				cell.setCellValue("NamSX");
+				cell.setCellStyle(style);
+				
+				cell = row.createCell(7, CellType.STRING);
+				cell.setCellValue("NamSD");
+				cell.setCellStyle(style);
+				
+				cell = row.createCell(8, CellType.STRING);
+				cell.setCellValue("Model");
+				cell.setCellStyle(style);
+				
+				cell = row.createCell(9, CellType.STRING);
+				cell.setCellValue("Country");
+				cell.setCellStyle(style);
+				
+				cell = row.createCell(10, CellType.STRING);
+				cell.setCellValue("Company");
+				cell.setCellStyle(style);
+				
+
+				// Data
+				for (ThietBi tb : list) {
+			
+					rownum++;
+					row = sheet.createRow(rownum);
+
+					// EmpNo (A)
+					cell = row.createCell(0, CellType.STRING);
+					cell.setCellValue(tb.getMaTB());
+					// EmpName (B)
+					cell = row.createCell(1, CellType.STRING);
+					cell.setCellValue(tb.getTenTB());
+					// Salary (C)
+					cell = row.createCell(2, CellType.STRING);
+					cell.setCellValue(tb.getMaPhong());
+					// Grade (D)
+					cell = row.createCell(3, CellType.STRING);
+					cell.setCellValue(tb.getMaTinhTrang());
+					// Bonus (E)
+					cell = row.createCell(4, CellType.STRING);
+					cell.setCellValue(tb.getNgayNhapTB().toString());
+					
+					cell = row.createCell(5, CellType.STRING);
+					cell.setCellValue(tb.getHanBT().toString());
+					
+					cell = row.createCell(6, CellType.STRING);
+					cell.setCellValue(String.valueOf(tb.getNamSX()));
+					
+					cell = row.createCell(7, CellType.STRING);
+					cell.setCellValue(String.valueOf(tb.getNamSD()));
+					
+					cell = row.createCell(8, CellType.STRING);
+					cell.setCellValue(tb.getModel());
+					
+					cell = row.createCell(9, CellType.STRING);
+					cell.setCellValue(tb.getCountry());
+					
+					cell = row.createCell(10, CellType.STRING);
+					cell.setCellValue(tb.getCompany());
+					
+				}
+//				File file = new File("D:/duyanh/readexcel.xls");
+//				System.out.println(pathExcel+"\\thietbi.xls");
+				File file = new File(pathExcel + "\\thietbi.xls");
+				file.getParentFile().mkdirs();
+
+				FileOutputStream outFile = null;
+				try {
+					outFile = new FileOutputStream(file);
+				} catch (FileNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				try {
+					workbook.write(outFile);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				System.out.println("Created file: " + file.getAbsolutePath());
 			}
 		});
 		btnExport.setForeground(Color.WHITE);
@@ -694,4 +859,13 @@ public class ThietBiView extends JFrame {
 	public void showMessage(String message) {
 		JOptionPane.showMessageDialog(this, message);
 	}
+	
+	
+    private static XSSFCellStyle createStyleForTitle(XSSFWorkbook workbook) {
+        XSSFFont font = workbook.createFont();
+        font.setBold(true);
+        XSSFCellStyle style = workbook.createCellStyle();
+        style.setFont(font);
+        return style;
+    }
 }
