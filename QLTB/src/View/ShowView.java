@@ -95,7 +95,7 @@ public class ShowView extends JFrame {
 
 		arr = new ArrayList<String>();
 		// load database
-		Connection conn = getConnection("localhost", "5432", "QLTB", "postgres", "123");
+		Connection conn = getConnection("192.168.1.10", "5432", "QLTB", "postgres", "123");
 		try {
 			Statement st = conn.createStatement();
 			ResultSet rs = st.executeQuery("SELECT tentb FROM public.thietbi");
@@ -209,7 +209,7 @@ public class ShowView extends JFrame {
 				header.add("giatien");
 
 				// load database
-				Connection conn = getConnection("localhost", "5432", "QLTB", "postgres", "123");
+				Connection conn = getConnection("192.168.1.10", "5432", "QLTB", "postgres", "123");
 				try {
 					Statement st = conn.createStatement();
 					ResultSet rs = st.executeQuery("SELECT matb, tentb, maphong, matinhtrang, ngaynhaptb, hanbaotri,"
@@ -281,7 +281,7 @@ public class ShowView extends JFrame {
 				header.add("giatien");
 
 				// load database
-				Connection conn = getConnection("localhost", "5432", "QLTB", "postgres", "123");
+				Connection conn = getConnection("192.168.1.10", "5432", "QLTB", "postgres", "123");
 				try {
 					Statement st = conn.createStatement();
 					ResultSet rs = st.executeQuery("SELECT matb, tentb, maphong, matinhtrang, ngaynhaptb, hanbaotri,"
@@ -380,7 +380,7 @@ public class ShowView extends JFrame {
 				header.add("giatien");
 				String text = textTen.getText();
 				// load database
-				Connection conn = getConnection("localhost", "5432", "QLTB", "postgres", "123");
+				Connection conn = getConnection("192.168.1.10", "5432", "QLTB", "postgres", "123");
 				try {
 					Statement st = conn.createStatement();
 					ResultSet rs = st.executeQuery("SELECT matb, tentb, maphong, matinhtrang, ngaynhaptb, hanbaotri,"
@@ -531,9 +531,9 @@ public class ShowView extends JFrame {
 		JButton btnUpdate = new JButton("Cập Nhật");
 		btnUpdate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Connection conn = getConnection("localhost", "5432", "QLTB", "postgres", "123");
+				Connection conn = getConnection("192.168.1.10", "5432", "QLTB", "postgres", "123");
 				// data
-				
+
 				String maTB = textMa.getText();
 				String tenTB = textTenTB.getText();
 				String maPhong = getMaPhong(comboMaP.getSelectedIndex());
@@ -543,9 +543,9 @@ public class ShowView extends JFrame {
 				String country = textCountry.getText();
 				int namSX = 2021;
 				int namSD = 2021;
-				if(!textSX.getText().equals(""))
+				if (!textSX.getText().equals(""))
 					namSX = Integer.valueOf(textSX.getText());
-				if(!textSD.getText().equals(""))
+				if (!textSD.getText().equals(""))
 					namSD = Integer.valueOf(textSD.getText());
 				double giaTien = 0;
 				if (!textMoney.getText().equals(""))
@@ -561,35 +561,37 @@ public class ShowView extends JFrame {
 				if (!textBT.getText().equals("")) {
 					numBT = dateNhap.getTime() + (Long.valueOf(textBT.getText()) * 30 * 24 * 60 * 60 * 1000);
 					dateBT = new Date(numBT);
+				} else
+					dateBT = Date.valueOf(strDate);
+				if (!maTB.equals("") && !tenTB.equals("") && !maPhong.equals("") && !maTT.equals("")) {
+
+					String query2 = "UPDATE public.thanhly SET giatl=\'" + giaTien + "\'" + " WHERE matb=\'" + maTB
+							+ "\'";
+					String query1 = "UPDATE public.thietbi SET tentb=\'" + tenTB + "\'" + ",maphong=\'" + maPhong + "\'"
+							+ ",matinhtrang=\'" + maTT + "\'" + ",ngaynhaptb=\'" + dateNhap + "\'" + ",hanbaotri=\'"
+							+ dateBT + "\'" + ",namsx=\'" + namSX + "\'" + ",namsd=\'" + namSD + "\'" + ",model=\'"
+							+ model + "\'" + ",country=\'" + country + "\'" + ",company=\'" + company + "\'"
+							+ " WHERE matb=\'" + maTB + "\'" + " ;" + query2;
+
+					System.out.println(query1);
+
+					PreparedStatement st = null;
+					try {
+						st = conn.prepareStatement(query1);
+					} catch (SQLException e2) {
+						// TODO Auto-generated catch block
+						e2.printStackTrace();
+					}
+					try {
+						st.executeUpdate();
+						showMessage("Cập nhật thành công!");
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+						showMessage("Cập nhật thành công!");
+					}
 				}
-				else dateBT = Date.valueOf(strDate);
-				
-				String query2 = "UPDATE public.thanhly SET giatl=\'" + giaTien + "\'" + " WHERE matb=\'" + maTB + "\'";
-				String query1 = "UPDATE public.thietbi SET tentb=\'" + tenTB + "\'" + ",maphong=\'" + maPhong + "\'" +
-						",matinhtrang=\'" + maTT + "\'" + ",ngaynhaptb=\'" + dateNhap + "\'" + ",hanbaotri=\'" + dateBT + "\'" +
-						",namsx=\'" + namSX + "\'" + ",namsd=\'" + namSD + "\'" + ",model=\'" + model + "\'" + 
-						",country=\'" + country + "\'" + ",company=\'" + company + "\'" +
-						" WHERE matb=\'" + maTB + "\'" + " ;" + query2;
-	
-				System.out.println(query1);
-				
-				PreparedStatement st = null;
-				try {
-					st = conn.prepareStatement(query1);
-				} catch (SQLException e2) {
-					// TODO Auto-generated catch block
-					e2.printStackTrace();
-				}
-				try {
-					st.executeUpdate();
-					showMessage("Cập nhật thành công!");
-				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-					showMessage("Cập nhật thành công!");
-				}
-				
-				
+
 			}
 		});
 		btnUpdate.setBounds(528, 209, 89, 48);
@@ -656,7 +658,6 @@ public class ShowView extends JFrame {
 		}
 		return conn;
 	}
-	
 
 	public String getMaTT(int index) {
 		switch (index) {
@@ -683,7 +684,7 @@ public class ShowView extends JFrame {
 			return "A1";
 		}
 	}
-	
+
 	public void showMessage(String message) {
 		JOptionPane.showMessageDialog(this, message);
 	}
