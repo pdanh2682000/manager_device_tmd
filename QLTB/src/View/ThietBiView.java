@@ -165,9 +165,9 @@ public class ThietBiView extends JFrame {
 				String country = textCountry.getText();
 				int namSX = 2021;
 				int namSD = 2021;
-				if(!textNamSX.getText().equals(""))
+				if (!textNamSX.getText().equals(""))
 					namSX = Integer.valueOf(textNamSX.getText());
-				if(!textNamSD.getText().equals(""))
+				if (!textNamSD.getText().equals(""))
 					namSD = Integer.valueOf(textNamSX.getText());
 				double giaTien = 0;
 				if (!textMoney.getText().equals(""))
@@ -183,8 +183,8 @@ public class ThietBiView extends JFrame {
 				if (!textBT.getText().equals("")) {
 					numBT = dateNhap.getTime() + (Long.valueOf(textBT.getText()) * 30 * 24 * 60 * 60 * 1000);
 					dateBT = new Date(numBT);
-				}
-				else dateBT = Date.valueOf(strDate);
+				} else
+					dateBT = Date.valueOf(strDate);
 
 				// set default data
 				if (model.equals(""))
@@ -203,8 +203,8 @@ public class ThietBiView extends JFrame {
 					showMessage("Mã tình trạng không được để trống!");
 				else {
 					try {
-						insertDB_TB(maTB, tenTB, maPhong, maTT, namSX, namSD, model, country, company, dateNhap, giaTien,
-								dateBT);
+						insertDB_TB(maTB, tenTB, maPhong, maTT, namSX, namSD, model, country, company, dateNhap,
+								giaTien, dateBT);
 						showMessage("Thêm mới thành công!");
 					} catch (SQLException e1) {
 						// TODO Auto-generated catch block
@@ -288,7 +288,7 @@ public class ThietBiView extends JFrame {
 
 				// insert
 				if (!pathExcel.equals("")) {
-					
+
 					try {
 						insertFromExcel(pathExcel);
 						showMessage("Load File thành công!");
@@ -330,211 +330,211 @@ public class ThietBiView extends JFrame {
 		btnShow.setBackground(new Color(0, 153, 204));
 		btnShow.setBounds(470, 288, 113, 30);
 		contentPane.add(btnShow);
-		
+
 		JLabel labelNamSX = new JLabel("Năm SX");
 		labelNamSX.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		labelNamSX.setBounds(460, 210, 57, 14);
 		contentPane.add(labelNamSX);
-		
+
 		textNamSX = new JTextField();
 		textNamSX.setColumns(10);
 		textNamSX.setBounds(527, 205, 86, 26);
 		contentPane.add(textNamSX);
-		
+
 		JLabel labelNamSD = new JLabel("Năm SD");
 		labelNamSD.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		labelNamSD.setBounds(623, 211, 57, 14);
 		contentPane.add(labelNamSD);
-		
+
 		textNamSD = new JTextField();
 		textNamSD.setColumns(10);
 		textNamSD.setBounds(681, 207, 86, 26);
 		contentPane.add(textNamSD);
-		
+
 		JButton btnExport = new JButton("Xuất Excel");
 		btnExport.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// choose file
 				String pathExcel = new String();
 				JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
-		        jfc.setDialogTitle("Chọn thư mục: ");
-		        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		        int returnValue = jfc.showSaveDialog(null);
-		        if (returnValue == JFileChooser.APPROVE_OPTION) {
-		            if (jfc.getSelectedFile().isDirectory()) {
-		            	pathExcel = jfc.getSelectedFile().getAbsolutePath();
-		                System.out.println("Bạn đã chọn: " + pathExcel);
-		            }
-		        }
-		        // load database
-		        ArrayList<ThietBi> list = new ArrayList<ThietBi>();
-		        Connection conn = getConnection("localhost", "5432", "QLTB", "postgres", "123");
-		        try {
-		            // crate statement
-		            Statement stmt = conn.createStatement();
-		            // get data from table 'student'
-		            ResultSet rs = stmt.executeQuery("SELECT * from public.thietbi NATURAL JOIN public.thanhly");
-		            // show data
-		            while (rs.next()) {
+				jfc.setDialogTitle("Chọn thư mục: ");
+				jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				int returnValue = jfc.showSaveDialog(null);
+				if (returnValue == JFileChooser.APPROVE_OPTION) {
+					if (jfc.getSelectedFile().isDirectory()) {
+						pathExcel = jfc.getSelectedFile().getAbsolutePath();
+						System.out.println("Bạn đã chọn: " + pathExcel);
+					}
+				}
+				if (!pathExcel.equals("")) {
+					// load database
+					ArrayList<ThietBi> list = new ArrayList<ThietBi>();
+					Connection conn = getConnection("192.168.1.10", "5432", "QLTB", "postgres", "123");
+					try {
+						// crate statement
+						Statement stmt = conn.createStatement();
+						// get data from table 'student'
+						ResultSet rs = stmt.executeQuery("SELECT * from public.thietbi NATURAL JOIN public.thanhly");
+						// show data
+						while (rs.next()) {
 //		                System.out.println(rs.getInt(1) + "  " + rs.getString(2) 
 //		                        + "  " + rs.getString(3));
-		                ThietBi tb = new ThietBi();
-		                tb.setMaTB(rs.getString(1));
-		                tb.setTenTB(rs.getString(2));
-		                tb.setMaPhong(rs.getString(3));
-		                tb.setMaTinhTrang(rs.getString(4));
-		                tb.setNgayNhapTB(rs.getDate(5));
-		                tb.setHanBT(rs.getDate(6));
-		                tb.setNamSX((int)rs.getDouble(7));
-		                tb.setNamSD((int)rs.getDouble(8));
-		                tb.setModel(rs.getString(9));
-		                tb.setCountry(rs.getString(10));
-		                tb.setCompany(rs.getString(11));
-		                
-		                DecimalFormat df = new DecimalFormat("##");
-		                String strGiaTien = df.format(rs.getDouble(13)); 
-		                
-		                tb.setGiaTien(Double.parseDouble(strGiaTien));
-		                list.add(tb);
-		            }
-		            // close connection
-		            conn.close();
-		        } catch (Exception ex) {
-		            ex.printStackTrace();
-		        }
-		        
-		        // export 
-		        XSSFWorkbook workbook = new XSSFWorkbook();
-				XSSFSheet sheet = workbook.createSheet("ThietBi sheet");
+							ThietBi tb = new ThietBi();
+							tb.setMaTB(rs.getString(1));
+							tb.setTenTB(rs.getString(2));
+							tb.setMaPhong(rs.getString(3));
+							tb.setMaTinhTrang(rs.getString(4));
+							tb.setNgayNhapTB(rs.getDate(5));
+							tb.setHanBT(rs.getDate(6));
+							tb.setNamSX((int) rs.getDouble(7));
+							tb.setNamSD((int) rs.getDouble(8));
+							tb.setModel(rs.getString(9));
+							tb.setCountry(rs.getString(10));
+							tb.setCompany(rs.getString(11));
 
-				int rownum = 0;
-				Cell cell;
-				Row row;
-				//
-				XSSFCellStyle style = createStyleForTitle(workbook);
+							DecimalFormat df = new DecimalFormat("##");
+							String strGiaTien = df.format(rs.getDouble(13));
 
-				row = sheet.createRow(rownum);
+							tb.setGiaTien(Double.parseDouble(strGiaTien));
+							list.add(tb);
+						}
+						// close connection
+						conn.close();
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
 
-			
-				cell = row.createCell(0, CellType.STRING);
-				cell.setCellValue("MaTB");
-				cell.setCellStyle(style);
-				
-				cell = row.createCell(1, CellType.STRING);
-				cell.setCellValue("TenTB");
-				cell.setCellStyle(style);
-		
-				cell = row.createCell(2, CellType.STRING);
-				cell.setCellValue("MaPhong");
-				cell.setCellStyle(style);
-			
-				cell = row.createCell(3, CellType.STRING);
-				cell.setCellValue("MaTT");
-				cell.setCellStyle(style);
-				
-				cell = row.createCell(4, CellType.STRING);
-				cell.setCellValue("NgayNhap");
-				cell.setCellStyle(style);
-				
-				cell = row.createCell(5, CellType.STRING);
-				cell.setCellValue("HanBT");
-				cell.setCellStyle(style);
-				
-				cell = row.createCell(6, CellType.STRING);
-				cell.setCellValue("NamSX");
-				cell.setCellStyle(style);
-				
-				cell = row.createCell(7, CellType.STRING);
-				cell.setCellValue("NamSD");
-				cell.setCellStyle(style);
-				
-				cell = row.createCell(8, CellType.STRING);
-				cell.setCellValue("Model");
-				cell.setCellStyle(style);
-				
-				cell = row.createCell(9, CellType.STRING);
-				cell.setCellValue("Country");
-				cell.setCellStyle(style);
-				
-				cell = row.createCell(10, CellType.STRING);
-				cell.setCellValue("Company");
-				cell.setCellStyle(style);
-				
-				cell = row.createCell(11, CellType.STRING);
-				cell.setCellValue("GiaTien");
-				cell.setCellStyle(style);
-				
+					// export
+					XSSFWorkbook workbook = new XSSFWorkbook();
+					XSSFSheet sheet = workbook.createSheet("ThietBi sheet");
 
-				// Data
-				for (ThietBi tb : list) {
-			
-					rownum++;
+					int rownum = 0;
+					Cell cell;
+					Row row;
+					//
+					XSSFCellStyle style = createStyleForTitle(workbook);
+
 					row = sheet.createRow(rownum);
 
-					// EmpNo (A)
 					cell = row.createCell(0, CellType.STRING);
-					cell.setCellValue(tb.getMaTB());
-					// EmpName (B)
+					cell.setCellValue("MaTB");
+					cell.setCellStyle(style);
+
 					cell = row.createCell(1, CellType.STRING);
-					cell.setCellValue(tb.getTenTB());
-					// Salary (C)
+					cell.setCellValue("TenTB");
+					cell.setCellStyle(style);
+
 					cell = row.createCell(2, CellType.STRING);
-					cell.setCellValue(tb.getMaPhong());
-					// Grade (D)
+					cell.setCellValue("MaPhong");
+					cell.setCellStyle(style);
+
 					cell = row.createCell(3, CellType.STRING);
-					cell.setCellValue(tb.getMaTinhTrang());
-					// Bonus (E)
+					cell.setCellValue("MaTT");
+					cell.setCellStyle(style);
+
 					cell = row.createCell(4, CellType.STRING);
-					cell.setCellValue(tb.getNgayNhapTB().toString());
-					
+					cell.setCellValue("NgayNhap");
+					cell.setCellStyle(style);
+
 					cell = row.createCell(5, CellType.STRING);
-					cell.setCellValue(tb.getHanBT().toString());
-					
+					cell.setCellValue("HanBT");
+					cell.setCellStyle(style);
+
 					cell = row.createCell(6, CellType.STRING);
-					cell.setCellValue(String.valueOf(tb.getNamSX()));
-					
+					cell.setCellValue("NamSX");
+					cell.setCellStyle(style);
+
 					cell = row.createCell(7, CellType.STRING);
-					cell.setCellValue(String.valueOf(tb.getNamSD()));
-					
+					cell.setCellValue("NamSD");
+					cell.setCellStyle(style);
+
 					cell = row.createCell(8, CellType.STRING);
-					cell.setCellValue(tb.getModel());
-					
+					cell.setCellValue("Model");
+					cell.setCellStyle(style);
+
 					cell = row.createCell(9, CellType.STRING);
-					cell.setCellValue(tb.getCountry());
-					
+					cell.setCellValue("Country");
+					cell.setCellStyle(style);
+
 					cell = row.createCell(10, CellType.STRING);
-					cell.setCellValue(tb.getCompany());
-					
+					cell.setCellValue("Company");
+					cell.setCellStyle(style);
+
 					cell = row.createCell(11, CellType.STRING);
-					cell.setCellValue(String.valueOf(tb.getGiaTien()));
-					
-				}
-				
-		        // Auto resize column witdth
-		        int numberOfColumn = sheet.getRow(0).getPhysicalNumberOfCells();
-		        autosizeColumn(sheet, numberOfColumn);
-		        
+					cell.setCellValue("GiaTien");
+					cell.setCellStyle(style);
+
+					// Data
+					for (ThietBi tb : list) {
+
+						rownum++;
+						row = sheet.createRow(rownum);
+
+						// EmpNo (A)
+						cell = row.createCell(0, CellType.STRING);
+						cell.setCellValue(tb.getMaTB());
+						// EmpName (B)
+						cell = row.createCell(1, CellType.STRING);
+						cell.setCellValue(tb.getTenTB());
+						// Salary (C)
+						cell = row.createCell(2, CellType.STRING);
+						cell.setCellValue(tb.getMaPhong());
+						// Grade (D)
+						cell = row.createCell(3, CellType.STRING);
+						cell.setCellValue(tb.getMaTinhTrang());
+						// Bonus (E)
+						cell = row.createCell(4, CellType.STRING);
+						cell.setCellValue(tb.getNgayNhapTB().toString());
+
+						cell = row.createCell(5, CellType.STRING);
+						cell.setCellValue(tb.getHanBT().toString());
+
+						cell = row.createCell(6, CellType.STRING);
+						cell.setCellValue(String.valueOf(tb.getNamSX()));
+
+						cell = row.createCell(7, CellType.STRING);
+						cell.setCellValue(String.valueOf(tb.getNamSD()));
+
+						cell = row.createCell(8, CellType.STRING);
+						cell.setCellValue(tb.getModel());
+
+						cell = row.createCell(9, CellType.STRING);
+						cell.setCellValue(tb.getCountry());
+
+						cell = row.createCell(10, CellType.STRING);
+						cell.setCellValue(tb.getCompany());
+
+						cell = row.createCell(11, CellType.STRING);
+						cell.setCellValue(String.valueOf(tb.getGiaTien()));
+
+					}
+
+					// Auto resize column witdth
+					int numberOfColumn = sheet.getRow(0).getPhysicalNumberOfCells();
+					autosizeColumn(sheet, numberOfColumn);
+
 //				File file = new File("D:/duyanh/readexcel.xls");
 //				System.out.println(pathExcel+"\\thietbi.xls");
-				File file = new File(pathExcel + "\\thietbi.xlsx");
-				file.getParentFile().mkdirs();
+					File file = new File(pathExcel + "\\thietbi.xlsx");
+					file.getParentFile().mkdirs();
 
-				FileOutputStream outFile = null;
-				try {
-					outFile = new FileOutputStream(file);
-				} catch (FileNotFoundException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					FileOutputStream outFile = null;
+					try {
+						outFile = new FileOutputStream(file);
+					} catch (FileNotFoundException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					try {
+						workbook.write(outFile);
+						showMessage("Xuất File thành công!");
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+						showMessage("Xuất File thất bại!");
+					}
+					System.out.println("Created file: " + file.getAbsolutePath());
 				}
-				try {
-					workbook.write(outFile);
-					showMessage("Xuất File thành công!");
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-					showMessage("Xuất File thất bại!");
-				}
-				System.out.println("Created file: " + file.getAbsolutePath());
 			}
 		});
 		btnExport.setForeground(Color.WHITE);
@@ -558,7 +558,7 @@ public class ThietBiView extends JFrame {
 
 	public ArrayList<String> getAllMaTB(String header) throws SQLException {
 		ArrayList<String> arr = new ArrayList<String>();
-		Connection conn = getConnection("localhost", "5432", "QLTB", "postgres", "123");
+		Connection conn = getConnection("192.168.1.10", "5432", "QLTB", "postgres", "123");
 		if (conn != null) {
 			Statement st = null;
 			ResultSet rs = null;
@@ -580,7 +580,7 @@ public class ThietBiView extends JFrame {
 
 	public void insertDB_TB(String maTB, String tenTB, String maPhong, String maTT, double namSX, double namSD,
 			String model, String country, String company, Date date, double giaTien, Date hanBT) throws SQLException {
-		Connection conn = getConnection("localhost", "5432", "QLTB", "postgres", "123");
+		Connection conn = getConnection("192.168.1.10", "5432", "QLTB", "postgres", "123");
 		if (maPhong.equals(""))
 			maPhong = "A1"; // default
 		if (maTT.equals(""))
@@ -626,7 +626,7 @@ public class ThietBiView extends JFrame {
 	}
 
 	public void insertDB_TL(String maTB, Date date, Double giaTien) throws SQLException {
-		Connection conn = getConnection("localhost", "5432", "QLTB", "postgres", "123");
+		Connection conn = getConnection("192.168.1.10", "5432", "QLTB", "postgres", "123");
 		if (giaTien <= 0)
 			giaTien = (double) 1;
 		if (conn != null) {
@@ -884,19 +884,18 @@ public class ThietBiView extends JFrame {
 	public void showMessage(String message) {
 		JOptionPane.showMessageDialog(this, message);
 	}
-	
-	
-    private static XSSFCellStyle createStyleForTitle(XSSFWorkbook workbook) {
-        XSSFFont font = workbook.createFont();
-        font.setBold(true);
-        XSSFCellStyle style = workbook.createCellStyle();
-        style.setFont(font);
-        return style;
-    }
-    
-    private static void autosizeColumn(Sheet sheet, int lastColumn) {
-        for (int columnIndex = 0; columnIndex < lastColumn; columnIndex++) {
-            sheet.autoSizeColumn(columnIndex);
-        }
-    }
+
+	private static XSSFCellStyle createStyleForTitle(XSSFWorkbook workbook) {
+		XSSFFont font = workbook.createFont();
+		font.setBold(true);
+		XSSFCellStyle style = workbook.createCellStyle();
+		style.setFont(font);
+		return style;
+	}
+
+	private static void autosizeColumn(Sheet sheet, int lastColumn) {
+		for (int columnIndex = 0; columnIndex < lastColumn; columnIndex++) {
+			sheet.autoSizeColumn(columnIndex);
+		}
+	}
 }
