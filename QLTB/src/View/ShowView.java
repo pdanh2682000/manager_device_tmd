@@ -127,7 +127,7 @@ public class ShowView extends JFrame {
 		contentPane.setLayout(null);
 
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 311, 1164, 215);
+		scrollPane.setBounds(0, 307, 1164, 215);
 		contentPane.add(scrollPane);
 
 		table = new JTable();
@@ -248,7 +248,7 @@ public class ShowView extends JFrame {
 				table.setModel(new DefaultTableModel(data, header));
 			}
 		});
-		btnShowAll.setBounds(513, 537, 89, 23);
+		btnShowAll.setBounds(383, 533, 89, 23);
 		contentPane.add(btnShowAll);
 
 		labelMaTB = new JLabel("Mã TB");
@@ -533,7 +533,7 @@ public class ShowView extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				Connection conn = getConnection("localhost", "5432", "QLTB", "postgres", "123");
 				// data
-				
+
 				String maTB = textMa.getText();
 				String tenTB = textTenTB.getText();
 				String maPhong = getMaPhong(comboMaP.getSelectedIndex());
@@ -543,9 +543,9 @@ public class ShowView extends JFrame {
 				String country = textCountry.getText();
 				int namSX = 2021;
 				int namSD = 2021;
-				if(!textSX.getText().equals(""))
+				if (!textSX.getText().equals(""))
 					namSX = Integer.valueOf(textSX.getText());
-				if(!textSD.getText().equals(""))
+				if (!textSD.getText().equals(""))
 					namSD = Integer.valueOf(textSD.getText());
 				double giaTien = 0;
 				if (!textMoney.getText().equals(""))
@@ -561,18 +561,18 @@ public class ShowView extends JFrame {
 				if (!textBT.getText().equals("")) {
 					numBT = dateNhap.getTime() + (Long.valueOf(textBT.getText()) * 30 * 24 * 60 * 60 * 1000);
 					dateBT = new Date(numBT);
-				}
-				else dateBT = Date.valueOf(strDate);
-				
+				} else
+					dateBT = Date.valueOf(strDate);
+
 				String query2 = "UPDATE public.thanhly SET giatl=\'" + giaTien + "\'" + " WHERE matb=\'" + maTB + "\'";
-				String query1 = "UPDATE public.thietbi SET tentb=\'" + tenTB + "\'" + ",maphong=\'" + maPhong + "\'" +
-						",matinhtrang=\'" + maTT + "\'" + ",ngaynhaptb=\'" + dateNhap + "\'" + ",hanbaotri=\'" + dateBT + "\'" +
-						",namsx=\'" + namSX + "\'" + ",namsd=\'" + namSD + "\'" + ",model=\'" + model + "\'" + 
-						",country=\'" + country + "\'" + ",company=\'" + company + "\'" +
-						" WHERE matb=\'" + maTB + "\'" + " ;" + query2;
-	
+				String query1 = "UPDATE public.thietbi SET tentb=\'" + tenTB + "\'" + ",maphong=\'" + maPhong + "\'"
+						+ ",matinhtrang=\'" + maTT + "\'" + ",ngaynhaptb=\'" + dateNhap + "\'" + ",hanbaotri=\'"
+						+ dateBT + "\'" + ",namsx=\'" + namSX + "\'" + ",namsd=\'" + namSD + "\'" + ",model=\'" + model
+						+ "\'" + ",country=\'" + country + "\'" + ",company=\'" + company + "\'" + " WHERE matb=\'"
+						+ maTB + "\'" + " ;" + query2;
+
 				System.out.println(query1);
-				
+
 				PreparedStatement st = null;
 				try {
 					st = conn.prepareStatement(query1);
@@ -588,8 +588,7 @@ public class ShowView extends JFrame {
 					e1.printStackTrace();
 					showMessage("Cập nhật thành công!");
 				}
-				
-				
+
 			}
 		});
 		btnUpdate.setBounds(528, 209, 89, 48);
@@ -642,6 +641,24 @@ public class ShowView extends JFrame {
 		textMa.setColumns(10);
 		textMa.setBounds(440, 246, 57, 25);
 		contentPane.add(textMa);
+
+		JButton btnFix = new JButton("Sửa chữa");
+		btnFix.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String maScTb = textMa.getText();
+//				 System.out.println(maScTb);
+				if (!maScTb.equals("")) {
+					SuaChuaView sc = new SuaChuaView(maScTb);
+					sc.setVisible(true);
+					sc.setLocationRelativeTo(null);
+					sc.setResizable(false);
+					sc.setDefaultCloseOperation(sc.HIDE_ON_CLOSE);
+					sc.setTitle("Sửa chữa");
+				}
+			}
+		});
+		btnFix.setBounds(629, 533, 117, 23);
+		contentPane.add(btnFix);
 	}
 
 	public Connection getConnection(String host, String port, String dbName, String username, String password) {
@@ -656,7 +673,6 @@ public class ShowView extends JFrame {
 		}
 		return conn;
 	}
-	
 
 	public String getMaTT(int index) {
 		switch (index) {
@@ -683,7 +699,7 @@ public class ShowView extends JFrame {
 			return "A1";
 		}
 	}
-	
+
 	public void showMessage(String message) {
 		JOptionPane.showMessageDialog(this, message);
 	}
