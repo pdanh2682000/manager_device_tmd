@@ -12,7 +12,7 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/DUYANH/Documents/GitHub/manager_device_tmdv2/QLTB/postgresql-42.2.20.jar">
+	<classpathentry kind="lib" path="D:/duyanh/manager_device_tmd/QLTB/postgresql-42.2.20.jar">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
