@@ -248,7 +248,7 @@ public class ShowView extends JFrame {
 				table.setModel(new DefaultTableModel(data, header));
 			}
 		});
-		btnShowAll.setBounds(513, 537, 89, 23);
+		btnShowAll.setBounds(412, 537, 89, 23);
 		contentPane.add(btnShowAll);
 
 		labelMaTB = new JLabel("Mã TB");
@@ -644,6 +644,24 @@ public class ShowView extends JFrame {
 		textMa.setColumns(10);
 		textMa.setBounds(440, 246, 57, 25);
 		contentPane.add(textMa);
+		
+		JButton btnFix = new JButton("Sửa chữa");
+		btnFix.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String maScTb = textMa.getText();
+//				 System.out.println(maScTb);
+				if (!maScTb.equals("")) {
+					SuaChuaView sc = new SuaChuaView(maScTb);
+					sc.setVisible(true);
+					sc.setLocationRelativeTo(null);
+					sc.setResizable(false);
+					sc.setDefaultCloseOperation(sc.HIDE_ON_CLOSE);
+					sc.setTitle("Sửa chữa");
+				}
+			}
+		});
+		btnFix.setBounds(594, 537, 117, 23);
+		contentPane.add(btnFix);
 	}
 
 	public Connection getConnection(String host, String port, String dbName, String username, String password) {
