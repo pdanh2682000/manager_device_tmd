@@ -80,6 +80,7 @@ public class LoginView extends JFrame {
 		textUsername.setColumns(10);
 		
 		JButton btnSubmit = new JButton("Login");
+		getRootPane().setDefaultButton(btnSubmit);
 		btnSubmit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				user = createUser();

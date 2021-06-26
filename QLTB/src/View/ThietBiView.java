@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.awt.event.ActionEvent;
 import java.awt.Color;
+import java.awt.Cursor;
+
 import javax.swing.SwingConstants;
 import java.awt.Font;
 
@@ -54,6 +56,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import Model.ThietBi;
+import javax.swing.JProgressBar;
 
 public class ThietBiView extends JFrame {
 
@@ -217,7 +220,7 @@ public class ThietBiView extends JFrame {
 		btnAdd.setBounds(32, 288, 113, 30);
 		contentPane.add(btnAdd);
 
-		comboMaP.setModel(new DefaultComboBoxModel(new String[] { "A1 (Phòng A1)", "A2 (Phòng A2)", "A3 (Phòng A3)" }));
+		comboMaP.setModel(new DefaultComboBoxModel(new String[] {"A1 (Phòng A1)", "A2 (Phòng A2)", "A3 (Phòng A3)", "A4 (Phòng A4)", "A5 (Phòng A5)", "A6 (Phòng A6)", "A7 (Phòng A7)", "A8 (Phòng A8)", "A9 (Phòng A9)", "A10 (Phòng A10)", "A11 (Phòng A11)", "A12 (Phòng A12)", "A13 (Phòng A13)", "A14 (Phòng A14)", "A15 (Phòng A15)", "A18 (Phòng A18)", "A19 (Phòng A19)", "B1 (Phòng B1)", "B2 (Phòng B2)", "B3 (Phòng B3)", "B4 (Phòng B4)", "B5 (Phòng B5)", "B6 (Phòng B6)", "B7 (Phòng B7)", "B8 (Phòng B8)", "B9 (Phòng B9)", "B10 (Phòng B10)", "B11 (Phòng B11)", "B12 (Phòng B12)", "B13 (Phòng B13)", "B14 (Phòng B14)", "B15 (Phòng B15)", "B16 (Phòng B16)", "B17 (Phòng B17)", "B18 (Phòng B18)", "B19 (Phòng B19)", "B20 (Phòng B20)", "B21 (Phòng B21)", "PM (Phòng mổ)", "XN (Phòng xét nghiệm)", "SA (Phòng siêu âm)", "XQ (Phòng X-Quang)", "DLX (Phòng DLX)", "TNT (Phòng TNT)", "NT (Phòng nội trú)"}));
 		comboMaP.setBounds(312, 207, 132, 23);
 		contentPane.add(comboMaP);
 
@@ -233,7 +236,7 @@ public class ThietBiView extends JFrame {
 		JLabel lblNewLabel = new JLabel("QUẢN LÝ THIẾT BỊ TMĐ");
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		lblNewLabel.setForeground(new Color(0, 0, 0));
-		lblNewLabel.setBounds(229, 11, 226, 22);
+		lblNewLabel.setBounds(307, 11, 226, 22);
 		contentPane.add(lblNewLabel);
 
 		JLabel labelModel = new JLabel("Model");
@@ -266,10 +269,16 @@ public class ThietBiView extends JFrame {
 		contentPane.add(textCountry);
 		textCountry.setColumns(10);
 
+		JProgressBar progressBar = new JProgressBar();
+		progressBar.setForeground(new Color(255, 69, 0));
+		progressBar.setBackground(Color.LIGHT_GRAY);
+		progressBar.setBounds(80, 428, 169, 20);
+		contentPane.add(progressBar);
+		
 		JButton btnFile = new JButton("Load File");
 		btnFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
+				progressBar.setValue(20);
 				String pathExcel = new String("");
 				JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
 				jfc.setDialogTitle("Chọn tệp tin: ");
@@ -285,12 +294,16 @@ public class ThietBiView extends JFrame {
 					pathExcel = jfc.getSelectedFile().getPath();
 					System.out.println(pathExcel);
 				}
-
 				// insert
 				if (!pathExcel.equals("")) {
 
 					try {
+						Cursor cursor = new Cursor(Cursor.WAIT_CURSOR); // HAND CURSOR
+					    setCursor(cursor);
 						insertFromExcel(pathExcel);
+						cursor = new Cursor(Cursor.DEFAULT_CURSOR); // HAND CURSOR
+					    setCursor(cursor);
+						progressBar.setValue(100);
 						showMessage("Load File thành công!");
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
@@ -301,6 +314,7 @@ public class ThietBiView extends JFrame {
 						showMessage("Load File thất bại!");
 					}
 				}
+				progressBar.setValue(0);
 			}
 		});
 		btnFile.setForeground(Color.WHITE);
@@ -354,6 +368,7 @@ public class ThietBiView extends JFrame {
 		JButton btnExport = new JButton("Xuất Excel");
 		btnExport.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				progressBar.setValue(20);
 				// choose file
 				String pathExcel = new String();
 				JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
@@ -368,6 +383,8 @@ public class ThietBiView extends JFrame {
 				}
 				if (!pathExcel.equals("")) {
 					// load database
+					Cursor cursor = new Cursor(Cursor.WAIT_CURSOR); // HAND CURSOR
+				    setCursor(cursor);
 					ArrayList<ThietBi> list = new ArrayList<ThietBi>();
 					Connection conn = getConnection("192.168.1.10", "5432", "QLTB", "postgres", "123");
 					try {
@@ -527,6 +544,9 @@ public class ThietBiView extends JFrame {
 					}
 					try {
 						workbook.write(outFile);
+						progressBar.setValue(100);
+						cursor = new Cursor(Cursor.DEFAULT_CURSOR); // HAND CURSOR
+					    setCursor(cursor);
 						showMessage("Xuất File thành công!");
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
@@ -535,12 +555,19 @@ public class ThietBiView extends JFrame {
 					}
 					System.out.println("Created file: " + file.getAbsolutePath());
 				}
+				progressBar.setValue(0);
 			}
 		});
 		btnExport.setForeground(Color.WHITE);
 		btnExport.setBackground(new Color(0, 153, 204));
 		btnExport.setBounds(323, 288, 113, 30);
 		contentPane.add(btnExport);
+		
+		
+		JLabel lblProcessing = new JLabel("Processing");
+		lblProcessing.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		lblProcessing.setBounds(10, 428, 64, 20);
+		contentPane.add(lblProcessing);
 	}
 
 	public Connection getConnection(String host, String port, String dbName, String username, String password) {
@@ -836,6 +863,90 @@ public class ThietBiView extends JFrame {
 			return "A2";
 		case 2:
 			return "A3";
+		case 3:
+			return "A4";
+		case 4:
+			return "A5";
+		case 5:
+			return "A6";
+		case 6:
+			return "A7";
+		case 7:
+			return "A8";
+		case 8:
+			return "A9";
+		case 9:
+			return "A10";
+		case 10:
+			return "A11";
+		case 11:
+			return "A12";
+		case 12:
+			return "A13";
+		case 13:
+			return "A14";
+		case 14:
+			return "A15";
+		case 15:
+			return "A18";
+		case 16:
+			return "A19";
+		case 17:
+			return "B1";
+		case 18:
+			return "B2";
+		case 19:
+			return "B3";
+		case 20:
+			return "B4";
+		case 21:
+			return "B5";
+		case 22:
+			return "B6";
+		case 23:
+			return "B7";
+		case 24:
+			return "B8";
+		case 25:
+			return "B9";
+		case 26:
+			return "B10";
+		case 27:
+			return "B11";
+		case 28:
+			return "B12";
+		case 29:
+			return "B13";
+		case 30:
+			return "B14";
+		case 31:
+			return "B15";
+		case 32:
+			return "B16";
+		case 33:
+			return "B17";
+		case 34:
+			return "B18";
+		case 35:
+			return "B19";
+		case 36:
+			return "B20";
+		case 37:
+			return "B21";
+		case 38:
+			return "PM";
+		case 39:
+			return "XN";
+		case 40:
+			return "SA";
+		case 41:
+			return "XQ";
+		case 42:
+			return "DLX";
+		case 43:
+			return "TNT";
+		case 44:
+			return "NT";
 		default:
 			return "A1";
 		}
